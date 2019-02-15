@@ -2,6 +2,8 @@
 \usepackage{amsmath}
 \usepackage{setspace}
 \usepackage{indentfirst}
+\usepackage{environ}
+\usepackage[utf8]{inputenc}
 \newcommand{\numpy}{{\tt numpy}}    % tt font for numpy
 
 \topmargin -.5in
@@ -9,6 +11,10 @@
 \oddsidemargin -.25in
 \evensidemargin -.25in
 \textwidth 7in
+
+
+
+
 \begin{document}
 
 % ========== Edit your name here
@@ -186,7 +192,7 @@ The softmax expression which indicates the probability of the j-th class is as f
     $
     f'(x) = \frac{h'(x)g(x)-g'(x)h(x)}{[g(x)]^2}
     $
-\end{center}For now, $h_i = e^{\beta x_{i}}$, and $g_i = \sum_{i}e^{\beta x_{i}}$. For the convenience, first we simply use the summation symbol $\sum$ to represent $\sum_{i}e^{\beta x_{i}}$. Note that no matter what $x_{i}$ we compute the derivative of $g(x)$, the result would always be $\beta e^{\beta x_{i}}$. However for computing the derivative of $e^{\beta x_{j}}$ w.r.t $x_{i}$, if i = j, the result would be $\beta e^{\beta x_{i}}$, otherwise it would be zero.
+\end{center}For now, $h_i = e^{\beta x_{i}}$, and $g_i = \sum_{i}e^{\beta x_{i}}$. For the convenience, we simply use the summation symbol $\sum$ to represent $\sum_{i}e^{\beta x_{i}}$. Note that no matter what $x_{i}$ we compute the derivative of $g(x)$, the result would always be $\beta e^{\beta x_{i}}$. However for computing the derivative of $e^{\beta x_{j}}$ w.r.t $x_{i}$, if i = j, the result would be $\beta e^{\beta x_{i}}$, otherwise it would be zero.
 \newline\indent Therefore, if i = j:
 \begin{center}
     $
@@ -219,7 +225,7 @@ The softmax expression which indicates the probability of the j-th class is as f
 \end{center}To conclude, the expression for $\frac{\partial y_{j}}{\partial x{i}}$ would be:
 \begin{center}
     $
-    \frac{\partial y_{j}}{\partial x{i}}=
+     \frac{\partial y_{j}}{\partial x{i}}=
     \begin{cases}
         \beta y_{i}(1-y_{j}) & \text i = j \\
         -\beta y_{j}y_{i} & \text i \neq j
@@ -228,8 +234,8 @@ The softmax expression which indicates the probability of the j-th class is as f
 \end{center}Or we can formulate it more concisely:
 \begin{center}
     $
-        \frac{\partial y_{j}}{\partial x{i}}=
-        \beta y_{i}(1(i = j) - y_{j})
+    \frac{\partial y_{j}}{\partial x{i}}=
+    \beta y_{i}(1(i = j) - y_{j})
     $
 \end{center}
 
