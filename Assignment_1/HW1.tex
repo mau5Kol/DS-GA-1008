@@ -200,12 +200,36 @@ The softmax expression which indicates the probability of the j-th class is as f
     $
     = \beta y_{i}(1-y_{j})
     $
-\end{center}Or if i $\neq$ j:
+\end{center}or if i $\neq$ j:
 \begin{center}
     $
      \frac{\partial y_{j}}{\partial x_{i}}=
     \frac{\partial \frac{e^{\beta x_{j}}}{\sum_{i}e^{\beta x_{i}}}}{\partial x_{i}}=
     \frac{0 - e^{\beta x_{j}}\beta e^{\beta x_{i}}}{\sum^2}  
+    $\\
+    $
+    = -\frac{e^{\beta x_{j}}}{\sum}\frac{\beta e^{\beta x_{i}}}{\sum}
+    $\\
+    $
+    = -y_{j}\beta y_{i}
+    $\\
+    $
+    = -\beta y_{j}y_{i}
+    $
+\end{center}To conclude, the expression for $\frac{\partial y_{j}}{\partial x{i}}$ would be:
+\begin{center}
+    $
+    \frac{\partial y_{j}}{\partial x{i}}=
+    \begin{cases}
+        \beta y_{i}(1-y_{j}) & \text i = j \\
+        -\beta y_{j}y_{i} & \text i \neq j
+    \end{cases}
+    $
+\end{center}Or we can formulate it more concisely:
+\begin{center}
+    $
+        \frac{\partial y_{j}}{\partial x{i}}=
+        \beta y_{i}(1(i = j) - y_{j})
     $
 \end{center}
 
