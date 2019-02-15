@@ -12,16 +12,14 @@
 \begin{document}
 
 % ========== Edit your name here
-\author{Chengze(Kol) Zuo}
+\author{Chengze(Kol) Zuo\\cz1565@nyu.edu}
 \title{DS-GA 1008 Homework Assignment 1}
 \date{February 14, 2019}
 \maketitle
 
-\medskip
-
 % ========== Begin answering questions here
 
-\section*{Part I}
+\section*{\centering Part I}
 \subsection*{\indent1.1}
 
 According to the instructions, let \textbf{x} be the column vector
@@ -157,28 +155,63 @@ w_{2,1}x_{1}+w_{2,2}x_{2}+b_{2}
 \end{center}
 
 
-
 \subsection*{\indent1.2}
 
-\begin{equation*}
-    a^2 + b^2 = c^2.
-\end{equation*}
+The softmax expression which indicates the probability of the j-th class is as follows:
+\begin{center}
+    $P(z=j|\mathbf{x}) = y_{i} = \frac{e^{\beta x_{j}}}{\sum_{i}e^{\beta x_{i}}}$
+\end{center}To compute the Jacobian matrix $\frac{\partial \mathbf{y}}{\partial \mathbf{x}}$ looks like:
+\begin{center}
+    $
+    \frac{\partial \mathbf{y}}{\partial \mathbf{x}}=
+        \left[\begin{matrix}
+        \frac{\partial y_{1}}{\partial x_{1}} & \dots & \frac{\partial y_{1}}{\partial x_{n}} \\
+        \vdots & \ddots & \vdots \\
+        \frac{\partial y_{n}}{\partial x_{1}} & \dots & \frac{\partial y_{n}}{\partial x_{n}}
+        \end{matrix}\right]
+    $
+\end{center}\setstretch{1.5}For computing any given partial derivative, i.e., the rate of the change for $j$-th element $y_{j}$ in the output vector w.r.t $i$-th element $x_{i}$ in the input vector, the $\frac{\partial y_{j}}{\partial x_{i}}$ would be computed as follow:
+\begin{center}
+    $
+    \frac{\partial y_{j}}{\partial x_{i}}=
+    \frac{\partial \frac{e^{\beta x_{j}}}{\sum_{i}e^{\beta x_{i}}}}{\partial x_{i}}
+    $
+\end{center}Given the quotient rule for computing derivatives, suppose:
+\begin{center}
+    $
+    f(x) = \frac{h(x)}{g(x)}
+    $
+\end{center}we know that:
+\begin{center}
+    $
+    f'(x) = \frac{h'(x)g(x)-g'(x)h(x)}{[g(x)]^2}
+    $
+\end{center}For now, $h_i = e^{\beta x_{i}}$, and $g_i = \sum_{i}e^{\beta x_{i}}$. For the convenience, first we simply use the summation symbol $\sum$ to represent $\sum_{i}e^{\beta x_{i}}$. Note that no matter what $x_{i}$ we compute the derivative of $g(x)$, the result would always be $\beta e^{\beta x_{i}}$. However for computing the derivative of $e^{\beta x_{j}}$ w.r.t $x_{i}$, if i = j, the result would be $\beta e^{\beta x_{i}}$, otherwise it would be zero.
+\newline\indent Therefore, if i = j:
+\begin{center}
+    $
+    \frac{\partial y_{j}}{\partial x_{i}}=
+    \frac{\partial \frac{e^{\beta x_{j}}}{\sum_{i}e^{\beta x_{i}}}}{\partial x_{i}}=
+    \frac{\beta e^{\beta x_{i}}\sum - e^{\beta x_{j}}\beta e^{\beta x_{i}}}{\sum^2}
+    $\\
+    $
+    =\frac{\beta e^{\beta x_{i}}}{\sum}\frac{\sum - e^{\beta x_{j}}}{\sum}
+    $\\
+    $
+    = \beta y_{i}(1-y_{j})
+    $
+\end{center}Or if i $\neq$ j:
+\begin{center}
+    $
+     \frac{\partial y_{j}}{\partial x_{i}}=
+    \frac{\partial \frac{e^{\beta x_{j}}}{\sum_{i}e^{\beta x_{i}}}}{\partial x_{i}}=
+    \frac{0 - e^{\beta x_{j}}\beta e^{\beta x_{i}}}{\sum^2}  
+    $
+\end{center}
 
-Some people like to write scalars without boldface $x+y=1$ and vectors or matrices in boldface
-\begin{equation}
-    \mathbf{A} \mathbf{x} = \mathbf{b}.
-\end{equation}
 
-An example of a matrix \LaTeX:
-\begin{equation}
-    \mathbf{A} = \left(
-    \begin{array}{ccc}
-    3 & -1 & 2 \\ 	
-    0 & 1 & 2 \\ 
-    1 & 0 & -1 \\
-\end{array} 
-\right).  
-\end{equation}
+
+
 
 \end{document}
 \grid
