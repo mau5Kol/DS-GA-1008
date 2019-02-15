@@ -1,5 +1,7 @@
 \documentclass[12pt]{article}
-
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage{indentfirst}
 \newcommand{\numpy}{{\tt numpy}}    % tt font for numpy
 
 \topmargin -.5in
@@ -7,27 +9,111 @@
 \oddsidemargin -.25in
 \evensidemargin -.25in
 \textwidth 7in
-
 \begin{document}
 
 % ========== Edit your name here
 \author{Chengze(Kol) Zuo}
 \title{DS-GA 1008 Homework Assignment 1}
+\date{February 14, 2019}
 \maketitle
 
 \medskip
 
 % ========== Begin answering questions here
-\begin{enumerate}
 
-\item
-Answer to question 1:
+\section*{Part I}
+\subsection*{\indent1.1}
 
-% ========== Just examples, please delete before submitting
-Use inline equations for simple math $1+1=2$, and centered equations for more involved or important equations
-\begin{equation}
+According to the instructions, let \textbf{x} be the column vector
+$\left[
+\begin{matrix}
+x_{1}\\
+x_{2}
+\end{matrix}
+\right]$, let \textbf{y} be the column vector
+$\left[
+\begin{matrix}
+y_{1}\\
+y_{2}
+\end{matrix}
+\right]$, and let the weight matrix \textbf{W} be the 2x2 matrix
+$\left[
+\begin{matrix}
+w_{1,1} & w_{1,2}\\
+x_{2,1} & w_{2,2}
+\end{matrix}
+\right]$. Applying the $\textbf{y} = \textbf{W}\textbf{x} + \textbf{b}$ can give us $\textbf{y} = 
+\left[\begin{matrix}
+w_{1,1}x_{1}+w_{1,2}x_{2}+b\\
+w_{2,1}x_{1}+w_{2,2}x_{2}+b
+\end{matrix}\right]$. For the $\frac{\partial\textbf{L}}{\partial\textbf{W}}$, its shape would be same as the \textbf{W}. $\frac{\partial\textbf{L}}{\partial\textbf{W}} = 
+\left[\begin{matrix}
+\frac{\partial\textbf{L}}{\partial w_{1,1}} & \frac{\partial\textbf{L}}{\partial w_{1,2}}\\
+\frac{\partial\textbf{L}}{\partial w_{2,1}} & \frac{\partial\textbf{L}}{\partial w_{2,2}}
+\end{matrix}\right]$. For now, we focus on solving $\frac{\partial\textbf{L}}{\partial w_{1,1}}$, and then apply the same approach to $\frac{\partial\textbf{L}}{\partial w_{1,2}}$, $\frac{\partial\textbf{L}}{\partial w_{2,1}}$, etc.
+\setstretch{1.5}
+\newline\indent According to the chain rule, we can infer that:
+\begin{center}
+    $\frac{\partial\textbf{L}}{\partial w_{1,1}} = \frac{\partial\textbf{L}}{\partial \textbf{y}}\cdot\frac{\partial\textbf{y}}{\partial w_{1,1}}$
+\end{center}, where:
+\begin{center}
+    $
+    \frac{\partial\textbf{L}}{\partial \textbf{y}} = 
+    \left[\begin{matrix}
+    \frac{\partial\textbf{L}}{\partial y_{1}}\\
+    \frac{\partial\textbf{L}}{\partial y_{2}}
+    \end{matrix}\right] = 
+    \left[\begin{matrix}
+    dy_{1}\\
+    dy_{2}
+    \end{matrix}\right]$
+\end{center}, and $\frac{\partial\textbf{y}}{\partial w_{1,1}}$ equals:
+\begin{center}
+    $
+    \frac{\partial\textbf{y}}{\partial w_{1,1}}=
+    \left[\begin{matrix}
+    \frac{\partial y_{1}}{\partial w_{1,1}}\\
+    \frac{\partial y_{2}}{\partial w_{1,1}}
+    \end{matrix}\right]=
+    \left[\begin{matrix}
+    x_{1}\\
+    0
+    \end{matrix}\right]
+    $
+\end{center}Therefore, after applying the dot product between two vectors, we can get:
+\begin{center}
+    $
+    \frac{\partial \textbf{L}}{\partial w_{1,1}} = 
+    dy_{1}x_{1}
+    $
+\end{center}Therefore, we can infer that:
+\begin{center}
+    $\frac{\partial\textbf{L}}{\partial\textbf{W}} = 
+    \left[\begin{matrix}
+    \frac{\partial\textbf{L}}{\partial w_{1,1}} & \frac{\partial\textbf{L}}{\partial w_{1,2}}\\
+    \frac{\partial\textbf{L}}{\partial w_{2,1}} & \frac{\partial\textbf{L}}{\partial w_{2,2}}
+    \end{matrix}\right]=
+    \left[\begin{matrix}
+    dy_{1}x_{1} & dy_{1}x_{2}\\
+    dy_{2}x_{1} & dy_{2}x_{2}
+    \end{matrix}\right]=
+    \left[\begin{matrix}
+    dy_{1}\\
+    dy_{2}
+    \end{matrix}\right]
+    \left[\begin{matrix}
+    x_{1} & x_{2}
+    \end{matrix}\right]=
+    \frac{\partial\textbf{L}}{\partial\textbf{y}}\mathbf{x}^T
+    $
+\end{center}
+
+
+\subsection*{\indent1.2}
+
+\begin{equation*}
     a^2 + b^2 = c^2.
-\end{equation}
+\end{equation*}
 
 Some people like to write scalars without boldface $x+y=1$ and vectors or matrices in boldface
 \begin{equation}
@@ -44,22 +130,6 @@ An example of a matrix \LaTeX:
 \end{array} 
 \right).  
 \end{equation}
-
-With a labeled equation such as the following:
-\begin{equation}
-    \label{accel}
-    \frac{d^2 x}{d t^2} = a
-\end{equation}
-you can referrer to the equation later. In equation \ref{accel} we defined acceleration.
-% ========== END examples
-
-
-\item
-Answer to question 2
-
-% ========== Continue adding items as needed
-
-\end{enumerate}
 
 \end{document}
 \grid
