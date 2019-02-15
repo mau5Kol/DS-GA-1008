@@ -44,30 +44,28 @@ x_{2,1} & w_{2,2}
 \end{matrix}
 \right]$. Applying the $\textbf{y} = \textbf{W}\textbf{x} + \textbf{b}$ can give us $\textbf{y} = 
 \left[\begin{matrix}
-w_{1,1}x_{1}+w_{1,2}x_{2}+b\\
-w_{2,1}x_{1}+w_{2,2}x_{2}+b
-\end{matrix}\right]$. For the $\frac{\partial\textbf{L}}{\partial\textbf{W}}$, its shape would be same as the \textbf{W}. $\frac{\partial\textbf{L}}{\partial\textbf{W}} = 
+w_{1,1}x_{1}+w_{1,2}x_{2}+b_{1}\\
+w_{2,1}x_{1}+w_{2,2}x_{2}+b_{2}
+\end{matrix}\right]$. For the $\frac{\partial L}{\partial\textbf{W}}$, its shape would be same as the \textbf{W}, and $\frac{\partial L}{\partial\textbf{W}} = 
 \left[\begin{matrix}
-\frac{\partial\textbf{L}}{\partial w_{1,1}} & \frac{\partial\textbf{L}}{\partial w_{1,2}}\\
-\frac{\partial\textbf{L}}{\partial w_{2,1}} & \frac{\partial\textbf{L}}{\partial w_{2,2}}
-\end{matrix}\right]$. For now, we focus on solving $\frac{\partial\textbf{L}}{\partial w_{1,1}}$, and then apply the same approach to $\frac{\partial\textbf{L}}{\partial w_{1,2}}$, $\frac{\partial\textbf{L}}{\partial w_{2,1}}$, etc.
-\setstretch{1.5}
-\newline\indent According to the chain rule, we can infer that:
+\frac{\partial L}{\partial w_{1,1}} & \frac{\partial L}{\partial w_{1,2}}\\
+\frac{\partial L}{\partial w_{2,1}} & \frac{\partial L}{\partial w_{2,2}}
+\end{matrix}\right]$. For now, we focus on solving $\frac{\partial L}{\partial w_{1,1}}$, and then apply the same approach to $\frac{\partial L}{\partial w_{1,2}}$, $\frac{\partial L}{\partial w_{2,1}}$, etc.\setstretch{1.5}According to the chain rule, we can infer that:
 \begin{center}
-    $\frac{\partial\textbf{L}}{\partial w_{1,1}} = \frac{\partial\textbf{L}}{\partial \textbf{y}}\cdot\frac{\partial\textbf{y}}{\partial w_{1,1}}$
+    $\frac{\partial L}{\partial w_{1,1}} = \frac{\partial L}{\partial \textbf{y}}\cdot\frac{\partial\textbf{y}}{\partial w_{1,1}}$
 \end{center}, where:
 \begin{center}
     $
-    \frac{\partial\textbf{L}}{\partial \textbf{y}} = 
+    \frac{\partial L}{\partial \textbf{y}} = 
     \left[\begin{matrix}
-    \frac{\partial\textbf{L}}{\partial y_{1}}\\
-    \frac{\partial\textbf{L}}{\partial y_{2}}
+    \frac{\partial L}{\partial y_{1}}\\
+    \frac{\partial L}{\partial y_{2}}
     \end{matrix}\right] = 
     \left[\begin{matrix}
     dy_{1}\\
     dy_{2}
     \end{matrix}\right]$
-\end{center}, and $\frac{\partial\textbf{y}}{\partial w_{1,1}}$ equals:
+\end{center}, and $\frac{\partial\textbf{y}}{\partial w_{1,1}}$ equals to:
 \begin{center}
     $
     \frac{\partial\textbf{y}}{\partial w_{1,1}}=
@@ -83,15 +81,15 @@ w_{2,1}x_{1}+w_{2,2}x_{2}+b
 \end{center}Therefore, after applying the dot product between two vectors, we can get:
 \begin{center}
     $
-    \frac{\partial \textbf{L}}{\partial w_{1,1}} = 
+    \frac{\partial  L}{\partial w_{1,1}} = 
     dy_{1}x_{1}
     $
 \end{center}Therefore, we can infer that:
 \begin{center}
-    $\frac{\partial\textbf{L}}{\partial\textbf{W}} = 
+    $\frac{\partial L}{\partial\textbf{W}} = 
     \left[\begin{matrix}
-    \frac{\partial\textbf{L}}{\partial w_{1,1}} & \frac{\partial\textbf{L}}{\partial w_{1,2}}\\
-    \frac{\partial\textbf{L}}{\partial w_{2,1}} & \frac{\partial\textbf{L}}{\partial w_{2,2}}
+    \frac{\partial L}{\partial w_{1,1}} & \frac{\partial L}{\partial w_{1,2}}\\
+    \frac{\partial L}{\partial w_{2,1}} & \frac{\partial L}{\partial w_{2,2}}
     \end{matrix}\right]=
     \left[\begin{matrix}
     dy_{1}x_{1} & dy_{1}x_{2}\\
@@ -104,9 +102,60 @@ w_{2,1}x_{1}+w_{2,2}x_{2}+b
     \left[\begin{matrix}
     x_{1} & x_{2}
     \end{matrix}\right]=
-    \frac{\partial\textbf{L}}{\partial\textbf{y}}\mathbf{x}^T
+    \frac{\partial L}{\partial\textbf{y}}\mathbf{x}^T
     $
+\end{center}Using the same approach, for the $\frac{\partial L}{\partial \mathbf{b}}$, we can infer that:
+\begin{center}
+    $\frac{\partial L}{\partial \mathbf{b}} = \frac{\partial L}{\partial \textbf{y}}\cdot\frac{\partial\mathbf{y}}{\partial \mathbf{b}}$
+\end{center}where:
+\begin{center}
+    $
+    \frac{\partial\mathbf{L}}{\partial \mathbf{b}}=
+    \left[\begin{matrix}
+    \frac{\partial\mathbf{L}}{\partial b_{1}} \\
+    \frac{\partial\mathbf{L}}{\partial b_{2}} 
+    \end{matrix}\right]
+    $
+\end{center}    
+\begin{center}    
+    $
+    \frac{\partial\textbf{y}}{\partial b_{1}}=
+    \left[\begin{matrix}
+    \frac{\partial y_{1}}{\partial b_{1}} \\
+    \frac{\partial y_{2}}{\partial b_{1}} 
+    \end{matrix}\right]=
+    \left[\begin{matrix}
+    1\\
+    0
+    \end{matrix}\right]
+    $
+\end{center}Therefore, $\frac{\partial L}{\partial b_{1}}$ would be:
+\begin{center}
+    $
+    \frac{\partial L}{\partial b_{1}}=
+    \left[\begin{matrix}
+    dy_{1} \\
+    dy_{2}
+    \end{matrix}\right]\cdot\left[\begin{matrix}
+    1\\
+    0
+    \end{matrix}\right] = dy_{1}
+    $
+\end{center}Also, $\frac{\partial L}{\partial b_{2}}$ would be $dy_{2}$. Thus: 
+\begin{center}
+    $
+    \frac{\partial L}{\partial \mathbf{b}}= 
+    \left[\begin{matrix}
+    dy_{1} \\
+    dy_{2}
+    \end{matrix}\right]=
+    \frac{\partial\mathbf{L}}{\partial\mathbf{y}}
+    $
+    \begin{center}
+        (i.e., $\mathbf{I}\frac{\partial\mathbf{L}}{\partial\mathbf{y}}$, the Jacobian matrix $\frac{\partial\mathbf{y}}{\partial\mathbf{b}}$ is an Identity matrix)
+    \end{center}
 \end{center}
+
 
 
 \subsection*{\indent1.2}
