@@ -281,9 +281,48 @@ given convolution kernel. Assume that the bias term of the convolution is zero.
 The pooling is a technique for sub-sampling and comes in different flavors, for example max-pooling, average pooling, LP-pooling. 
 \begin{itemize}
     \item[(a)] List the \texttt{torch.nn} modules for the 2D versions of these pooling techniques and read on what they do.
+    
+    Answer: MaxPool2d, MaxUnpool2d(partial inverse of the MaxPool2d, can specify a different output size), AvgPool2d, FractionalMaxPool2d, LPPool2d, AdaptiveMaxPool2d, AdaptiveAvgPool2d
+    
     \item[(b)] Denote the $k$-th input feature maps to a pooling module as $\matr{X}^k \in \mathbb{R}^{H_{\textrm{in}}\times W_{\textrm{in}}} $ where $H_{\textrm{in}}$ and $W_{\text{in}}$ represent the input height and width, respectively. Let $\matr{Y}^k \in \mathbb{R}^{H_{\text{out}}\times W_{\textrm{out}}}$ denote the $k$-th output feature map of the module where $H_{\textrm{out}}$ and $W_{\textrm{out}}$ represent the output height and width, respectively. Let $S^{k}_{i,j}$ be a list of the indexes of elements in the sub-region of $X^k $ used for generating $\matr{Y}^k_{i,j}$, the $(i,j)$-th entry of $\matr{Y}^{k}$. 
     Using this notation, give formulas for $\matr{Y}^k_{i,j} $ from three pooling modules.
+    
+    Answer: First, denote that the kernel size as kH, kW, each of which represents the length along height and width. Then denote that the zero-padding as P and that the stride as sH and sW. Then we could derive formulas for $\matr{Y}^k_{i,j}$ for MaxPool2d, AvgPool2d and LPPool2d modules respectively.\\
+    
+    For MaxPool2d module: 
+    $
+    \matr{Y}^k_{i,j} = \underset{m=0,1\ldots,kH-1}{\max}
+    \underset{n=0,1\ldots,kW-1}{\max}
+    \matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]
+    $\\\setstretch{1.5}
+    For AvgPool2d module: 
+    $
+    \matr{Y}^k_{i,j} =
+    \frac{1}{kH\times kW}\sum_{m=0}^{kH-1}\sum_{n=0}^{kW-1}
+    \matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]
+    $\\\setstretch{1.5}
+    For LPPool2d module: Su
+    $
+    \matr{Y}^k_{i,j} = \sqrt[p]{\underset{x\in\matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]}{\sum x^p}}
+    $\quad (one would get Sum pooling if p = 1, or woule get Max pooling if p = $\infty$)
+    \\\setstretch{1.5}
+    Note that the zero-padding P is actually included in the input. If zero padding P is non-zero, then the input is implicitly zero-padded on both sides for P number of points. 
+    
     \item[(c)] Write out the result of applying a max-pooling module with kernel size of 2 and stride of 1 to $\matr{C}$ from Part 1.1.
+    
+    Answer: After applyling a max-pooling with kernel size of 2 and stride of 1 to $\matr{C}$, the result would be:
+    \begin{center}
+        \begin{tabular}{|c|c|c|} 
+    \hline
+       109 & 92  \\ \hline 
+       110 & 85  \\ \hline
+    \end{tabular}
+    \end{center}
     \item[(d)] Show how and why max-pooling and average pooling can be expressed in terms of LP-pooling.
+    
+    Answer: For the LP-pooling, if p goes to $\infty$, the formula $
+    \matr{Y}^k_{i,j} = \sqrt[p]{\underset{x\in\matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]}{\sum x^p}}
+    $ would be the max element in sub-region matrix $\matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]$. From the intuitive perspective, as p goes the $\infty$, the largest element would gain more weight/influence in the summation, and the difference between this largest element and other smaller elements would become larger, therefore, the result of the overall equation would approximate to that largest element. From the mathematical perspective, the result of LP-pooling as p going to $\infty$ would equal to computing the limit of this exponential series, where $\lim_{p \to \infty}(a_1^p + a_2^p + \ldots + a_m^p)^{1/p} = \max(a_1, a_2, \ldots, a_m)$, which is indeed the max-pooling.\\
+    If p = 1, the above formula is actually the sum of all the elements in the $\matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]$, which is proportional to the average pooling. Therefore we could express the average pooling as $\frac{1}{kH\times kW}$ times the result of LP-pooling where p equals to 1 (which one might also call as "Sum Pooling").
 \end{itemize}
 \end{document}
