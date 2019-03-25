@@ -67,7 +67,7 @@
 
 % Edit these as appropriate
 \newcommand\course{DS-GA 1008: Deep Learning, Spring 2019}
-\newcommand\hwnumber{2}                  % <-- homework number
+\newcommand\hwnumber{3}                  % <-- homework number
 \newcommand\NetIDa{cz1565}         
 
 \pagestyle{fancyplain}
@@ -85,246 +85,33 @@
 
 \begin{document}
 \begin{center}
-\texttt{The search for truth is more precious than its possession.\\  Albert Einstein (1879 - 1955)}
+\texttt{If you get, give.  If you learn, teach.  Maya Angelou (1928 - 2014)}
 \end{center}
-\section*{\centering Part I}
-\subsection*{\centering  \href{https://www.overleaf.com/read/bsjxfktnsjsw}{Read-only Link}
+\subsection*{\centering  \href{}{Read-only Link}
 }
+\section*{\centering Part I}
 
 \section*{1. Fundamentals}
-\subsection*{1.1. Convolution}
-Table \ref{tab1} depicts two matrices. The one on the left represents a $5\times 5$ single-channel image $\matr{A}$. The one on the right
- represents a $3\times 3$ convolution kernel $\matr{B}$. 
+\subsection*{1.1. Dropout}
 \begin{itemize}
-    \item[(a)] What is the dimensionality of the output if we forward propagate the image over the given convolution kernel with no padding and stride of 1? 
+    \item[(a)] List the torch.nn module corresponding to 2D dropout. 
     
-    Answer: Suppose the dimension of the input image is F, the kernel size is K, the size of zero-padding is P, and the stride size is S. The corresponding output size D after the convolution would be (suppose that width and height are both for the input image and the kernel):
-    \begin{center}
-        D = (F-K+2P)/S+1 
-    \end{center}
-    D = (5-3+0)/1+1 = 3. Therefore, the dimensionality of the output would be 3 x 3. 
+    Answer: torch.nn.Dropout2d(p=0.5, inplace=False)
     
-    \item[(b)] Give a general formula of the output width $O$ in terms of the input width $I$, kernel width $K$, stride $S$, and padding $P$ (both in the beginning and in the end). Note that the same formula holds for the height. Make sure that your answer in part (a) is consistent with your formula. 
+    \item[(b)] Read on what dropout is and give a short explanation on what it does and why it is useful. 
     
-    Answer: As discussed in the part(a), the general formula would be:
-    \begin{center}
-        O = (I-K+2P)/S+1 (same formula holds for height)
-    \end{center}
-    
-    \item[(c)] Compute the output $\matr{C}$ of forward propagating the image over the
-given convolution kernel. Assume that the bias term of the convolution is zero.
-
-    Answer: The output of the first neuron in the activation map would be element-wise multiplication between the sub-regeion matrix  
-    \begin{tabular}{|c|c|c|c|c|} 
-    \hline
-       4 & 5 & 2 \\ \hline 
-       3 & 3 & 2 \\ \hline
-       4 & 3 & 4 \\ \hline 
-    \end{tabular}\hspace{0.1cm} and the kernel 
-    \begin{tabular}{|c|c|c|} 
-    \hline
-       4 & 3 & 3 \\ \hline 
-       5 & 5 & 5 \\ \hline
-       2 & 4 & 3 \\ \hline 
-    \end{tabular}\hspace{0.1cm}\setstretch{1.5}, leading to 109. After we slide the kernel through the entire input image , the output $\matr{C}$ would be
-    \begin{center}
-        \begin{tabular}{|c|c|c|} 
-    \hline
-       109 & 92 & 72 \\ \hline 
-       108 & 85 & 74 \\ \hline
-       110 & 74 & 79 \\ \hline 
-    \end{tabular}
-    \end{center}
-    
-    \item[(d)] Suppose the gradient backpropagated from the layers above this layer is a $3\times 3$ matrix of all 1s. Write the value of the gradient (w.r.t.~the input image) backpropagated out of this layer.
-    
-    \begin{table}[!ht]
-    \centering
-    $\matr{A}$ =  \begin{tabular}{|c|c|c|c|c|} 
-    \hline
-       4 & 5 & 2 & 2 & 1 \\ \hline 
-       3 & 3 & 2 & 2 & 4 \\ \hline
-       4 & 3 & 4 & 1 & 1 \\ \hline 
-       5 & 1 & 4 & 1 & 2 \\ \hline
-       5 & 1 & 3 & 1 & 4 \\ \hline
-    \end{tabular}\hspace{1cm}
-    $\matr{B}$ = \begin{tabular}{|c|c|c|} 
-    \hline
-       4 & 3 & 3 \\ \hline 
-       5 & 5 & 5 \\ \hline
-       2 & 4 & 3 \\ \hline 
-    \end{tabular}
-    \caption{Image Matrix ($5\times 5$) and a convolution kernel ($3\times 3$).}
-    \label{tab1}
-   
-\end{table}
- Hint: You are given that $\frac{\partial E}{\partial \matr{C}_{ij}} = 1$ for some scalar error $E$ and $i,j\in\{1,2,3\}$. You need to compute $\frac{\partial E}{\partial \matr{A}_{ij}}$ for  $i,j\in\{1, \ldots, 5\}$. The chain rule should help!
-
- Answer: According to the chain rule, $\frac{\partial E}{\partial \matr{A}_{ij}} = \frac{\partial E}{\partial \matr{C}}\cdot \frac{\partial \matr{C}}{\partial \matr{A}_{ij}}$, and for now, let us focus on solving $\frac{\partial E}{\partial \matr{A}_{11}}$. We can expand in it as:
- \begin{center}
-     $
-     \frac{\partial E}{\partial \matr{A}_{11}} =
-     \frac{\partial E}{\partial \matr{C_{11}}}\cdot \frac{\partial \matr{C_{11}}}{\partial \matr{A}_{11}} + 
-     \frac{\partial E}{\partial \matr{C_{12}}}\cdot \frac{\partial \matr{C_{12}}}{\partial \matr{A}_{11}} +
-     \frac{\partial E}{\partial \matr{C_{13}}}\cdot \frac{\partial \matr{C_{13}}}{\partial \matr{A}_{11}} +
-     \frac{\partial E}{\partial \matr{C_{21}}}\cdot \frac{\partial \matr{C_{21}}}{\partial \matr{A}_{11}} +
-     \frac{\partial E}{\partial \matr{C_{22}}}\cdot \frac{\partial \matr{C_{22}}}{\partial \matr{A}_{11}} +
-     \frac{\partial E}{\partial \matr{C_{23}}}\cdot \frac{\partial \matr{C_{23}}}{\partial \matr{A}_{11}} +
-     \frac{\partial E}{\partial \matr{C_{31}}}\cdot \frac{\partial \matr{C_{31}}}{\partial \matr{A}_{11}} +
-     \frac{\partial E}{\partial \matr{C_{32}}}\cdot \frac{\partial \matr{C_{32}}}{\partial \matr{A}_{11}} +
-     \frac{\partial E}{\partial \matr{C_{33}}}\cdot \frac{\partial \matr{C_{33}}}{\partial \matr{A}_{11}} 
-     $\\
-     $
-     = \frac{\partial E}{\partial \matr{C_{11}}}\cdot
-     \matr{B_{11}} + 
-     \frac{\partial E}{\partial \matr{C_{12}}}\cdot 0 +
-     \frac{\partial E}{\partial \matr{C_{13}}}\cdot 0 +
-     \frac{\partial E}{\partial \matr{C_{21}}}\cdot 0 +
-     \frac{\partial E}{\partial \matr{C_{22}}}\cdot 0 +
-     \frac{\partial E}{\partial \matr{C_{23}}}\cdot 0 +
-     \frac{\partial E}{\partial \matr{C_{31}}}\cdot 0 +
-     \frac{\partial E}{\partial \matr{C_{32}}}\cdot 0 +
-     \frac{\partial E}{\partial \matr{C_{33}}}\cdot 0
-     $\\
-     $
-     = 1 \cdot 4 = 4
-     $
- \end{center}Based on this strategy, we are able to infer that:
- \begin{center}
-     $
-     \frac{\partial E}{\partial \matr{A_{12}}} = 3 + 4 = 7
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{13}}} = 3 + 3 + 4 = 10 
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{14}}} = 3 + 3 = 6 
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{15}}} = 3 
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{21}}} = 5 + 4 = 9 
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{22}}} = 5 + 5 + 3 + 4 = 17
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{23}}} = 5 + 5 + 5 + 3 + 3 + 4 = 25 
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{24}}} = 5 + 5 + 3 + 3 = 16 
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{25}}} = 5 + 3 = 8
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{31}}} = 4 + 5 + 2 = 11
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{32}}} = 4 + 5 + 2 + 3 + 5 + 4 = 23
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{33}}} = \sum \matr{B_{ij}} = 34
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{34}}} = 3 + 5 + 3 + 3 + 5 + 4 = 23
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{35}}} = 3 + 5 + 3 = 11
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{41}}} = 2 + 5 = 7
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{42}}} = 5 + 5 + 2 + 4 = 16
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{43}}} = 5 + 5 + 5 + 3 + 4 + 2 = 24
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{44}}} = 4 + 3 + 5 + 5 = 17
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{45}}} = 3 + 5 = 8
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{51}}} = 2
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{52}}} = 2 + 4 = 6
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{53}}} = 2 + 4 + 3 = 9
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{54}}} = 3 + 4 = 7
-     $\\
-     $
-     \frac{\partial E}{\partial \matr{A_{55}}} = 3
-     $
- \end{center}Therefore, the result of the gradient w.r.t the input image would be:
- \begin{center}
-     $\matr{\frac{\partial E}{\partial A}}$ =  \begin{tabular}{|c|c|c|c|c|} 
-    \hline
-       4 & 7 & 10 & 6 & 3 \\ \hline 
-       9 & 17 & 25 & 16 & 8 \\ \hline
-       11 & 23 & 34 & 23 & 11 \\ \hline 
-       7 & 16 & 24 & 17 & 8 \\ \hline
-       2 & 6 & 9 & 7 & 3 \\ \hline
-    \end{tabular}
- \end{center}
-\end{itemize}. 
-
- 
-
-\newpage
-\subsection*{1.2. Pooling}
-The pooling is a technique for sub-sampling and comes in different flavors, for example max-pooling, average pooling, LP-pooling. 
-\begin{itemize}
-    \item[(a)] List the \texttt{torch.nn} modules for the 2D versions of these pooling techniques and read on what they do.
-    
-    Answer: MaxPool2d, MaxUnpool2d(partial inverse of the MaxPool2d, can specify a different output size), AvgPool2d, FractionalMaxPool2d, LPPool2d, AdaptiveMaxPool2d, AdaptiveAvgPool2d
-    
-    \item[(b)] Denote the $k$-th input feature maps to a pooling module as $\matr{X}^k \in \mathbb{R}^{H_{\textrm{in}}\times W_{\textrm{in}}} $ where $H_{\textrm{in}}$ and $W_{\text{in}}$ represent the input height and width, respectively. Let $\matr{Y}^k \in \mathbb{R}^{H_{\text{out}}\times W_{\textrm{out}}}$ denote the $k$-th output feature map of the module where $H_{\textrm{out}}$ and $W_{\textrm{out}}$ represent the output height and width, respectively. Let $S^{k}_{i,j}$ be a list of the indexes of elements in the sub-region of $X^k $ used for generating $\matr{Y}^k_{i,j}$, the $(i,j)$-th entry of $\matr{Y}^{k}$. 
-    Using this notation, give formulas for $\matr{Y}^k_{i,j} $ from three pooling modules.
-    
-    Answer: First, denote that the kernel size as kH, kW, each of which represents the length along height and width. Then denote that the zero-padding as P and that the stride as sH and sW. Then we could derive formulas for $\matr{Y}^k_{i,j}$ for MaxPool2d, AvgPool2d and LPPool2d modules respectively.\\
-    
-    For MaxPool2d module: 
-    $
-    \matr{Y}^k_{i,j} = \underset{m=0,1\ldots,kH-1}{\max}
-    \underset{n=0,1\ldots,kW-1}{\max}
-    \matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]
-    $\\\setstretch{1.5}
-    For AvgPool2d module: 
-    $
-    \matr{Y}^k_{i,j} =
-    \frac{1}{kH\times kW}\sum_{m=0}^{kH-1}\sum_{n=0}^{kW-1}
-    \matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]
-    $\\\setstretch{1.5}
-    For LPPool2d module: Su
-    $
-    \matr{Y}^k_{i,j} = \sqrt[p]{\underset{x\in\matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]}{\sum x^p}}
-    $\quad (one would get Sum pooling if p = 1, or woule get Max pooling if p = $\infty$)
-    \\\setstretch{1.5}
-    Note that the zero-padding P is actually included in the input. If zero padding P is non-zero, then the input is implicitly zero-padded on both sides for P number of points. 
-    
-    \item[(c)] Write out the result of applying a max-pooling module with kernel size of 2 and stride of 1 to $\matr{C}$ from Part 1.1.
-    
-    Answer: After applyling a max-pooling with kernel size of 2 and stride of 1 to $\matr{C}$, the result would be:
-    \begin{center}
-        \begin{tabular}{|c|c|c|} 
-    \hline
-       109 & 92  \\ \hline 
-       110 & 85  \\ \hline
-    \end{tabular}
-    \end{center}
-    \item[(d)] Show how and why max-pooling and average pooling can be expressed in terms of LP-pooling.
-    
-    Answer: For the LP-pooling, if p goes to $\infty$, the formula $
-    \matr{Y}^k_{i,j} = \sqrt[p]{\underset{x\in\matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]}{\sum x^p}}
-    $ would be the max element in sub-region matrix $\matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]$. From the intuitive perspective, as p goes the $\infty$, the largest element would gain more weight/influence in the summation, and the difference between this largest element and other smaller elements would become larger, therefore, the result of the overall equation would approximate to that largest element. From the mathematical perspective, the result of LP-pooling as p going to $\infty$ would equal to computing the limit of this exponential series, where $\lim_{p \to \infty}(a_1^p + a_2^p + \ldots + a_m^p)^{1/p} = \max(a_1, a_2, \ldots, a_m)$, which is indeed the max-pooling.\\
-    If p = 1, the above formula is actually the sum of all the elements in the $\matr{X}^k[\matr{S}^k_{i \times sH + m, j \times sW + n}]$, which is proportional to the average pooling. Therefore we could express the average pooling as $\frac{1}{kH\times kW}$ times the result of LP-pooling where p equals to 1 (which one might also call as "Sum Pooling").
+    Answer: Dropout is a technique that aims to reduce overfitting and provides a way of approximately combining many different neural networks together efficiently. The term "dropout" means that the some units in the hidden/input layers would be randomly removed from the neural network during the training time. Each unit would have a fixed probability p (indeendent of other units) representing this unit would be retained or not. Applying dropout to a neural network would amount to sampling a thinned version network from the original large network, where for each training time just one of the thinned version networks would be sampled and trained. The reason why dropout is useful is because it breaks the strong co-adaptions between the units to make dependence between units or the presence of units more unreliable. Randomly removing units during the training time adds "noise" to the network and make units more independent (rely more on themselves). Therefore this technique help reduce the generalization error greatly.
 \end{itemize}
+
+\subsection*{1.2 Batch Normalization}
+\begin{itemize}
+    \item[(a)]What does mini-batch refer to in the context of deep learning?
+    
+    Answer: The term mini-batch in the context of deep learning is referred as using more than one but less than all the training examples. 
+    
+    \item[(b)]Read on what batch norm is and give a short explanation on what it does and why it is useful.
+    
+    Answer: In the deep learning realm, we may refer the term internal covariance shift as the change in the distribution of network activations due to the change in network parameters during training. This effect would be amplified the network goes deeper, thus causing training to be really difficult. Batch normalization (aka batch norm) aims to solve (or at least alleviate) this problem, and therefore speed up training neural nets. It is a method of reparametization. The batch norm being useful is because firstly it reduces the internal covariance shift to make sure each layer inputs has desired distribution (fixed mean and variance), which would accelerate training the whole network. Moreover, the batch norm makes it possible to use saturating nonlinearities by preventing the network from getting stuck in the saturated mode. Thirdly, batch norm makes the neural network more resilliant to the parameter scale so that it will reduce the dependence of gradients on the parameter scale and of their initial values. Finally, batch norm would enable higher learning rate since it stablizes the learning and could regularize the model, thus reducing the need for dropout (Because the network no longer produces deterministic value for a given training example). 
+\end{itemize}
+\section*{2. Language Modeling}
 \end{document}
