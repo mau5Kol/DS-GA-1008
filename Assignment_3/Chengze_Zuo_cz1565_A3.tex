@@ -176,7 +176,24 @@
         result = _impl(input, batch_sizes, hx, self._flat_weights, self.bias,
          self.num_layers, self.dropout, self.training, self.bidirectional)
     \end{python}
-    For some reason, I could not find the C/C++ source code module\\ \textbf{torch.\_C.\_VariableFunctions} which owns the source implementation for rnn\_tanh function.
+    
+    In \textbf{pytorch/benchmark/fastrnns/factory.py}, we could also view the forward code snippet to get the idea of how the computational graph is formed.
+    \begin{python}
+        for batch in range(len(sequences)):
+            output = []
+            hy, cy = hxs[batch], cxs[batch]
+            inputs = sequences[batch].unbind(0)
+
+            for seq_idx in range(len(inputs)):
+                hy, cy = cell(
+                    inputs[seq_idx].unsqueeze(0), (hy, cy), wih, whh, bih, bhh)
+                output += [hy]
+            outputs += [torch.stack(output)]
+            hx_outs += [hy.unsqueeze(0)]
+            cx_outs += [cy.unsqueeze(0)]
+
+        return outputs, (hx_outs, cx_outs)
+    \end{python}
     
     Depends on different types of RNNs (many to one, many to many, one to many, encoder/decoder), the computation of the overall loss might be a little bit different, but the overall thought process would be similar. Suppose we have have recurrent neural network that have a pair of input/output at every time step in sequence. We unroll the network, compute and accumulate the loss across each time step, which is $\textbf{L} = \sum \textbf{L}^{(t)}$. After computing the accumulated loss, the loss is backpropogated through the whole network to the start. For a given model parameter, e.g. weight matrix, it is shared by each RNN unit across all time steps. Therefore, during the backpropagation through time, the gradient w.r.t the weight matrix could be summed across all time steps (all instances of the network). After that, the model parameter (weight matrix) is updated given by specified learning rate.
     
