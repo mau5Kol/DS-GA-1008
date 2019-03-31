@@ -91,7 +91,7 @@
 \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30]
 \tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
 \tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
-\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{process2} = [rectangle, minimum width=3cm, minimum height=2cm, text centered, draw=black, fill=green!30]
 \tikzstyle{arrow} = [thick,->,>=stealth]
 
 
@@ -130,21 +130,35 @@
 \begin{itemize}
     \item[(a)]Go through the code and draw a block diagram / flow chart (see this tutorial) which highlights the main interacting components, illustrates their functionality, and provides an estimate of their computational time percentage (rough profiling).
     
-    Answer:
+    Answer: 
+    For the sake of simplicity, we would illustrate the training process concretely. It would be similar for the evaluation and prediction phase as well.\\
+    1)Prepare: Prepare word dictionary/dorpus and arrange the corpus into training, validation and testing set (in data.py).\\
+    2)Batchify: This phase batchifies training corpuse(set) into a set of batches. Starting from sequential data, batchify arranges the dataset into columns. For every batch training, send one batch to the model.
+    3)RNN: Based on the model type that is selected, the training phase begins. Each batch training the model computes the output and final hidden state. The output is used to compute the loss while the hidden state will be detached for every next batch training. The reason to do this is because we want the backpropogation through time is only computed through this current batch instead of to the start of the whole training set. During each batch training, the \textbf{torch.nn.utils.clip\_grad\_norm\_} would be used to the gradient clipping to reduce the issue of the exploding gradient. The model.py contains parts including encoder, dropout, rnn and decoder. 
     
-        \begin{tikzpicture}
-            \node (start) [startstop] {Start};
-            \node (prepare) [io, below of=start, yshift=-1cm, text width=5cm] {Prepare training set};
-            \node (batch) [process, yshift=-1cm, below of=prepare] {Batchifying};
-            \node (train) [decision, below of=batch, yshift=-2cm] {Training RNN};
-            \node (hidden) [process, left of=train, xshift=-3cm, text width=2cm] {Hidden state};
-            \node (loss) [process, below of=train, yshift=-2cm] {Compute Loss};
-            
-            % \draw [arrow] (start) -- (prepare)
-            % \draw [arrow] (prepare) -- (batch)
-            % \draw [arrow] (batch) -- (train)
-        \end{tikzpicture}
-    \textbf{I am sorry, I am out of time...}
+    \begin{tikzpicture}[node distance=2cm]
+        \node (start) [startstop] {Start};
+        \node (prepare) [io, below of=start, yshift=-1cm, text width=2cm] {Prepare};
+        \node (batch) [process, yshift=-1cm, below of=prepare] {Batchify};
+        \node (train) [process2, below of=batch, yshift=-2cm] {RNN};
+        \node (hidden) [process, left of=train, xshift=-4cm, text width=2cm] {Hidden state};
+        \node (loss) [process, below of=train, yshift=-4cm] {Compute the loss};
+        
+        \draw [arrow] (start) -- (prepare);
+        \draw [arrow] (prepare) -- (batch);
+        \draw [arrow] (batch) -- node[anchor=west, text width=4cm]{send a batch to the network} (train);
+        
+        \draw [arrow] ([yshift=0.1cm]hidden.east) -- node[anchor=south, text width=2cm] {set the hidden state(initialize as zeros for the firt batch)} ([yshift=0.1cm]train.west);
+        
+        \draw [arrow] ([yshift=-0.1cm]train.west) -- node[anchor=north, text width=2cm] {set the computed hidden for next batch} ([yshift=-0.1cm]hidden.east);
+        
+        \draw [arrow] ([xshift=-0.2cm]train.south) -- node[anchor=east, text width=4cm] {compare model outputs with targets} ([xshift=-0.2cm]loss.north);
+        
+        \draw [arrow] ([xshift=0.2cm]loss.north) -- node[anchor=west, text width = 4cm]{backprop through time and updated learned parameters} ([xshift=0.2cm]train.south);
+        % downward is NORTH
+        
+        
+    \end{tikzpicture}
     
     \item[(b)]Find and explain where and how the back-propagation through time (BPTT) takes place (you may need to delve into PyTorch source code).
     
@@ -152,6 +166,17 @@
     \begin{python}
         loss.backward()
     \end{python}
+    
+    From the PyTorch source code, the computational graph on which the backward() is called actually forms from here:
+    \begin{python}
+    if batch_sizes is None:
+        result = _impl(input, hx, self._flat_weights, self.bias, self.num_layers,
+         self.dropout, self.training, self.bidirectional, self.batch_first)
+    else:
+        result = _impl(input, batch_sizes, hx, self._flat_weights, self.bias,
+         self.num_layers, self.dropout, self.training, self.bidirectional)
+    \end{python}
+    For some reason, I could not find the C/C++ source code module\\ \textbf{torch.\_C.\_VariableFunctions} which owns the source implementation for rnn\_tanh function.
     
     Depends on different types of RNNs (many to one, many to many, one to many, encoder/decoder), the computation of the overall loss might be a little bit different, but the overall thought process would be similar. Suppose we have have recurrent neural network that have a pair of input/output at every time step in sequence. We unroll the network, compute and accumulate the loss across each time step, which is $\textbf{L} = \sum \textbf{L}^{(t)}$. After computing the accumulated loss, the loss is backpropogated through the whole network to the start. For a given model parameter, e.g. weight matrix, it is shared by each RNN unit across all time steps. Therefore, during the backpropagation through time, the gradient w.r.t the weight matrix could be summed across all time steps (all instances of the network). After that, the model parameter (weight matrix) is updated given by specified learning rate.
     
@@ -167,10 +192,10 @@
     
     \item[(e)]Compare LSTM and GRU performance (validation perplexity and training time) for different values of the following parameters: number of epochs, number of layers, hid- den units size, input embedding dimensionality, BPTT temporal interval, and non- linearities (pick just 3 of these parameters and experiment with 2-3 different values for each).
     
-    Answer: 
-    1. By comparing the LSTM and GRU with different epochs, I chose epochs with 2 and 4 respectively. For epochs as 2, GRU obtains higher validation perplexity while the LSTM would train longer; Turning the epochs to 4, both of the two networks are trained faster, but GRU still has higher validation perplexity.
-    
-    \textbf{I am sorry, I am out of time...}
+    Answer: \\
+    1)By comparing the LSTM and GRU with different epochs, I chose epochs with 2 and 4 respectively (number of layers is 2). For epoch number 4, GRU obtains higher validation perplexity while the LSTM would train longer; Turning the epochs to 2, both of the two networks are trained faster w.r.t training time in total, but compared to same type of model with 4 epochs, each epoch cost a little bit more time. Besides, GRU still has higher validation perplexity.\\
+    2)By comparing the LSTM and GRU with different number of layers, I chose nlayers with 1 and 2 (with 4 epochs to train). As the number of layer increases, the models both have longer training time (for each epoch and in total) and bigger training perplexity. For 2-layer model, epochs with more than 4 may be needed because the ppl might continues to decrease. In a nutshell, GRU would have larger validation perplexity but less training time compared to the LSTM (both for 1 layer and 2 layers).
+    3)By comparing the LSTM and GRU with different number of hidden units, I chose nhid 450, 650 and 850 for 1 layer and 4 epochs. For one-layer (default is 2) model, as the number of hidden units increases, the training time decreases a slight bit, but not obviously, and the validation perplexity also decreases a little bit (for same type of model). Usually GRU would end up with higher validation perplexity compared with LSTM.
     
     \item[(f)]Why do we compute performance on a test set as well? What is this number good for?
     
