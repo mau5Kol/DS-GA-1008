@@ -131,7 +131,7 @@
     \item[(a)]Go through the code and draw a block diagram / flow chart (see this tutorial) which highlights the main interacting components, illustrates their functionality, and provides an estimate of their computational time percentage (rough profiling).
     
     Answer: 
-    For the sake of simplicity, we would illustrate the training process concretely. It would be similar for the evaluation and prediction phase as well.\\
+    For the sake of simplicity, we would illustrate the training process concretely. It would be similar for the evaluation and test phase as well (without BPTT(i.e., without training)).\\
     1)Prepare: Prepare word dictionary/dorpus and arrange the corpus into training, validation and testing set (in data.py).\\
     2)Batchify: This phase batchifies training corpuse(set) into a set of batches. Starting from sequential data, batchify arranges the dataset into columns. For every batch training, send one batch to the model.
     3)RNN: Based on the model type that is selected, the training phase begins. Each batch training the model computes the output and final hidden state. The output is used to compute the loss while the hidden state will be detached for every next batch training. The reason to do this is because we want the backpropogation through time is only computed through this current batch instead of to the start of the whole training set. During each batch training, the \textbf{torch.nn.utils.clip\_grad\_norm\_} would be used to the gradient clipping to reduce the issue of the exploding gradient. The model.py contains parts including encoder, dropout, rnn and decoder. 
@@ -159,6 +159,12 @@
         
         
     \end{tikzpicture}
+    
+    Rough profiling: As experimenting these three models: \textbf{RNN\_TANH}, \textbf{LSTM} and \textbf{GRU} with all other default parameters, the rough estimate of the computational time percentage for each component would be as followed:\\
+    Training Time: $49\%$\\
+    Validation Time: $49\%$\\
+    Test Time: $2\%$
+    
     
     \item[(b)]Find and explain where and how the back-propagation through time (BPTT) takes place (you may need to delve into PyTorch source code).
     
